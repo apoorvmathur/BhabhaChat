@@ -18,6 +18,7 @@ public class Server implements Runnable {
 	
 	public static void startServer() throws IOException {
 		serverSocket = ServerSocketFactory.getDefault().createServerSocket(port);
+		System.out.println("Server Started!");
 		while (true) {
 			Socket socket = serverSocket.accept();
 			System.out.println("Connection Incoming!");
