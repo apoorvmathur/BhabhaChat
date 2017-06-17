@@ -1,24 +1,16 @@
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 
 public class Test {
 	
-	public static void main(String[] args) throws IOException {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		ObjectOutput out = new ObjectOutputStream(bos);
-		PubKey key = new PubKey("Dummy Key1", "Dummy Address", "Mogambo");
-		out.writeObject(key);
-		out.flush();
-		byte[] buf = bos.toByteArray();
-		DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName("255.255.255.255"), DiscoveryServer.port);
-		DatagramSocket socket = new DatagramSocket();
-		socket.send(packet);
-		socket.close();
+	public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+		
+		KeyPair kp = Encryption.generateKey();
+		String key = new String(kp.getPublic().getEncoded());
+		
+		PubKey pubKey = new PubKey(key, "Dummy Address", "Mogambo");
+		Beacon.sendBeacon(pubKey);
 	}
 }
 
