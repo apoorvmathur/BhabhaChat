@@ -11,12 +11,14 @@ public class Test {
 	public static void main(String[] args) throws IOException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ObjectOutput out = new ObjectOutputStream(bos);
-		String str = "Hi!";
-		out.writeObject(str);
+		PubKey key = new PubKey("Dummy Key1", "Dummy Address", "Mogambo");
+		out.writeObject(key);
 		out.flush();
 		byte[] buf = bos.toByteArray();
-		DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName("127.0.0.1"), DiscoveryServer.port);
+		DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName("255.255.255.255"), DiscoveryServer.port);
 		DatagramSocket socket = new DatagramSocket();
 		socket.send(packet);
+		socket.close();
 	}
 }
+

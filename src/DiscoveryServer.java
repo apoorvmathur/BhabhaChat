@@ -5,27 +5,34 @@ import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.ArrayList;
 
 public class DiscoveryServer {
-	
+
 	public static void main(String[] args) {
 		startServer();
 	}
-	
+
 	static final int port = 9081;
 	static DatagramSocket socket;
-	
+	static ArrayList<PubKey> hosts = new ArrayList<PubKey>();
+
 	public static void startServer() {
 		try {
 			socket = new DatagramSocket(port);
-			while(true) {
-				byte[] buf = new byte[1024];
-                DatagramPacket packet = new DatagramPacket(buf, buf.length);
+			while (true) {
+				byte[] buf = new byte[4096];
+				
+				DatagramPacket packet = new DatagramPacket(buf, buf.length);
 				socket.receive(packet);
+				
 				ByteArrayInputStream bis = new ByteArrayInputStream(buf);
 				ObjectInput in = new ObjectInputStream(bis);
-				String str = (String)in.readObject();
-				System.out.println(str);
+				
+				PubKey key = (PubKey) in.readObject();
+				key.setIpAddress(packet.getAddress().getHostAddress());
+				addHost(key);
+				System.out.println(hosts);
 				in.close();
 			}
 		} catch (SocketException e) {
@@ -33,9 +40,15 @@ public class DiscoveryServer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public static void addHost(PubKey key) {
+		if(hosts.contains(key)) {
+			hosts.remove(key);
+		}
+		hosts.add(key);
 	}
 
 }
