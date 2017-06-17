@@ -9,26 +9,33 @@ import java.util.ArrayList;
 
 public class DiscoveryServer {
 
+	static final int port = 9081;
+
+	static DatagramSocket socket;
+	static ArrayList<PubKey> hosts = new ArrayList<PubKey>();
+	public static void addHost(PubKey key) {
+		if (hosts.contains(key)) {
+			hosts.remove(key);
+		}
+		hosts.add(key);
+	}
+
 	public static void main(String[] args) {
 		startServer();
 	}
-
-	static final int port = 9081;
-	static DatagramSocket socket;
-	static ArrayList<PubKey> hosts = new ArrayList<PubKey>();
 
 	public static void startServer() {
 		try {
 			socket = new DatagramSocket(port);
 			while (true) {
-				byte[] buf = new byte[4096];
-				
+				byte[] buf = new byte[2048];
+
 				DatagramPacket packet = new DatagramPacket(buf, buf.length);
 				socket.receive(packet);
-				
+
 				ByteArrayInputStream bis = new ByteArrayInputStream(buf);
 				ObjectInput in = new ObjectInputStream(bis);
-				
+
 				PubKey key = (PubKey) in.readObject();
 				key.setIpAddress(packet.getAddress().getHostAddress());
 				addHost(key);
@@ -42,13 +49,6 @@ public class DiscoveryServer {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public static void addHost(PubKey key) {
-		if(hosts.contains(key)) {
-			hosts.remove(key);
-		}
-		hosts.add(key);
 	}
 
 }
